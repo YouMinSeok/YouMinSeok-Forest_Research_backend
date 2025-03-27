@@ -1,4 +1,3 @@
-# app/routers/auth.py
 from fastapi import APIRouter, HTTPException, BackgroundTasks, status, Response, Cookie
 from app.schemas.user import UserCreate, UserLogin
 from app.core.database import db
@@ -95,7 +94,6 @@ async def verify_code(data: dict, response: Response):
     if not user:
         raise HTTPException(status_code=404, detail="사용자 정보를 찾을 수 없습니다.")
     
-    # JWT 토큰 생성 ("sub", "name", "email" 포함)
     payload = {
         "sub": str(user["_id"]),
         "name": user["name"],
@@ -109,8 +107,8 @@ async def verify_code(data: dict, response: Response):
         value=token,
         httponly=True,
         max_age=3600,
-        secure=False,
-        samesite="lax"
+        secure=True,         # production 환경에서는 True (HTTPS)
+        samesite="None"      # cross-site 요청 허용
     )
     
     logger.info(f"{email} 인증 완료, 계정 활성화됨.")
@@ -126,7 +124,6 @@ async def login(user: UserLogin, response: Response):
     if not existing.get("is_active", False):
         raise HTTPException(status_code=400, detail="계정이 활성화되지 않았습니다. 이메일 인증을 진행해주세요.")
     
-    # JWT 토큰 생성 ("sub", "name", "email" 포함)
     payload = {
         "sub": str(existing["_id"]),
         "name": existing["name"],
@@ -140,8 +137,8 @@ async def login(user: UserLogin, response: Response):
         value=token,
         httponly=True,
         max_age=3600,
-        secure=False,
-        samesite="lax"
+        secure=True,         # production 환경에서는 True
+        samesite="None"      # cross-site 요청 허용
     )
     
     logger.info(f"{user.email} 로그인 성공, JWT 토큰 발급됨.")
@@ -149,9 +146,6 @@ async def login(user: UserLogin, response: Response):
 
 @router.get("/me", status_code=status.HTTP_200_OK)
 async def get_current_user_endpoint(access_token: str = Cookie(None)):
-    """
-    로그인된 사용자 정보 반환 (예: 프로필 조회)
-    """
     if not access_token:
         raise HTTPException(status_code=401, detail="토큰이 제공되지 않았습니다.")
     try:
