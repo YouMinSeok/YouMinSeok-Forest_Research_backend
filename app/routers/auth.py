@@ -107,8 +107,9 @@ async def verify_code(data: dict, response: Response):
         value=token,
         httponly=True,
         max_age=3600,
-        secure=True,         # production 환경: HTTPS 사용 시 True
-        samesite="None"      # cross-site 요청 허용
+        secure=True,         # HTTPS 환경에서 반드시 True
+        samesite="None",      # cross-site 요청 허용
+        domain=".sel4.cloudtype.app"  # 백엔드 도메인에 맞게 설정
     )
     
     logger.info(f"{email} 인증 완료, 계정 활성화됨.")
@@ -138,7 +139,8 @@ async def login(user: UserLogin, response: Response):
         httponly=True,
         max_age=3600,
         secure=True,         # production 환경에서는 True
-        samesite="None"      # cross-site 요청 허용
+        samesite="None",      # cross-site 요청 허용
+        domain=".sel4.cloudtype.app"  # 백엔드 도메인에 맞게 설정
     )
     
     logger.info(f"{user.email} 로그인 성공, JWT 토큰 발급됨.")
@@ -165,5 +167,5 @@ async def get_current_user_endpoint(access_token: str = Cookie(None)):
 
 @router.post("/logout", status_code=status.HTTP_200_OK)
 async def logout(response: Response):
-    response.delete_cookie("access_token")
+    response.delete_cookie("access_token", domain=".sel4.cloudtype.app")
     return {"message": "로그아웃 성공"}
