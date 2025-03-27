@@ -10,10 +10,11 @@ app = FastAPI(
     debug=settings.DEBUG
 )
 
-# 프론트엔드 주소 (필요에 따라 "*"도 사용 가능)
+# 프론트엔드 주소 (개발 + 배포 환경 둘 다 허용)
 origins = [
     "http://localhost:3000",
     "http://192.168.0.11:3000",
+    "https://port-0-youminseok-forest-research-backend-m8qrfco7a6ee3b26.sel4.cloudtype.app",
 ]
 
 app.add_middleware(
