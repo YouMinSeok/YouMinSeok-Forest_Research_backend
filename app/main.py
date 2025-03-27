@@ -10,12 +10,12 @@ app = FastAPI(
     debug=settings.DEBUG
 )
 
-# 프론트엔드 및 백엔드 도메인을 모두 허용 (개발, Netlify 프론트엔드, 백엔드 도메인)
+# 허용할 도메인 목록 (개발, Netlify 프론트엔드, 백엔드 도메인)
 origins = [
     "http://localhost:3000",
     "http://192.168.0.11:3000",
-    "https://researchforest.netlify.app",  # Netlify 프론트엔드 주소
-    "https://port-0-youminseok-forest-research-backend-m8qrfco7a6ee3b26.sel4.cloudtype.app",  # 백엔드 도메인
+    "https://researchforest.netlify.app",  # 프론트엔드(프로덕션) 주소
+    "https://port-0-youminseok-forest-research-backend-m8qrfco7a6ee3b26.sel4.cloudtype.app",  # 백엔드 주소
 ]
 
 app.add_middleware(
@@ -29,12 +29,12 @@ app.add_middleware(
 @app.on_event("startup")
 async def startup_event():
     await connect_to_mongo()
-    print("✅ MongoDB 연결 성공!")
+    print("MongoDB 연결 성공!")
 
 @app.on_event("shutdown")
 async def shutdown_event():
     await close_mongo_connection()
-    print("✅ MongoDB 연결 종료!")
+    print("MongoDB 연결 종료!")
 
 # 라우터 등록 ("/api" prefix)
 app.include_router(auth.router, prefix="/api/auth", tags=["auth"])

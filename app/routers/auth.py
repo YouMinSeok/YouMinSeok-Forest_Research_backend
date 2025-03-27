@@ -3,7 +3,7 @@ from app.schemas.user import UserCreate, UserLogin
 from app.core.database import db
 from app.utils.email import generate_verification_code, send_verification_email
 from datetime import datetime, timedelta
-import jwt
+import jwt  # PyJWT 사용
 from app.core.config import settings
 from app.utils.security import get_password_hash, verify_password
 import logging
@@ -107,7 +107,7 @@ async def verify_code(data: dict, response: Response):
         value=token,
         httponly=True,
         max_age=3600,
-        secure=True,         # production 환경에서는 True (HTTPS)
+        secure=True,         # production 환경: HTTPS 사용 시 True
         samesite="None"      # cross-site 요청 허용
     )
     

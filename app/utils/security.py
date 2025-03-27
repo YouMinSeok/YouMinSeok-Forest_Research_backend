@@ -1,7 +1,7 @@
-# app/utils/security.py
 from passlib.context import CryptContext
-from fastapi import Depends, HTTPException, Cookie
-from jose import jwt, JWTError
+from fastapi import HTTPException, Cookie
+import jwt  # PyJWT 사용
+from jwt import ExpiredSignatureError, InvalidTokenError
 from app.core.config import settings
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -14,7 +14,7 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 
 def get_current_user(access_token: str = Cookie(None)):
     """
-    쿠키 "access_token"에서 JWT 토큰을 읽어 "sub", "name"을 추출
+    쿠키 "access_token"에서 JWT 토큰을 읽어 "sub"와 "name"을 추출하여 사용자 정보를 반환합니다.
     """
     if not access_token:
         raise HTTPException(status_code=401, detail="토큰이 제공되지 않았습니다.")
@@ -24,7 +24,9 @@ def get_current_user(access_token: str = Cookie(None)):
         user_name: str = payload.get("name")
         if user_id is None or user_name is None:
             raise HTTPException(status_code=401, detail="토큰 정보가 부족합니다(sub, name).")
-    except JWTError:
-        raise HTTPException(status_code=401, detail="유효하지 않은 토큰")
+    except ExpiredSignatureError:
+        raise HTTPException(status_code=401, detail="토큰이 만료되었습니다.")
+    except InvalidTokenError:
+        raise HTTPException(status_code=401, detail="유효하지 않은 토큰입니다.")
     
     return {"id": user_id, "name": user_name}
