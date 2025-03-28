@@ -1,3 +1,4 @@
+import os
 from fastapi import APIRouter, HTTPException, BackgroundTasks, status, Response, Cookie
 from app.schemas.user import UserCreate, UserLogin
 from app.core.database import db
@@ -12,6 +13,29 @@ from bson import ObjectId
 router = APIRouter()
 logger = logging.getLogger("auth_router")
 logging.basicConfig(level=logging.INFO)
+
+# 백엔드에서는 settings.DEBUG를 사용하여 로컬 여부를 판단합니다.
+# 로컬이면 settings.DEBUG가 True, 프로덕션이면 False로 설정되어 있어야 합니다.
+is_local = settings.DEBUG
+
+def get_cookie_options():
+    if is_local:
+        return {
+            "httponly": True,
+            "max_age": 3600,
+            "secure": False,       # 로컬: HTTP 환경이므로
+            "samesite": "Lax",     # 로컬: Lax 사용
+            "path": "/"            # 모든 경로에 적용
+        }
+    else:
+        return {
+            "httponly": True,
+            "max_age": 3600,
+            "secure": True,        # 프로덕션: HTTPS 환경
+            "samesite": "None",     # cross-site 요청 허용
+            "domain": ".sel4.cloudtype.app",  # 백엔드 상위 도메인
+            "path": "/"
+        }
 
 def fix_mongo_object_ids(obj):
     if isinstance(obj, list):
@@ -105,11 +129,7 @@ async def verify_code(data: dict, response: Response):
     response.set_cookie(
         key="access_token",
         value=token,
-        httponly=True,
-        max_age=3600,
-        secure=True,         # HTTPS 환경에서 반드시 True
-        samesite="None",      # cross-site 요청 허용
-        domain=".sel4.cloudtype.app"  # 백엔드 도메인에 맞게 설정
+        **get_cookie_options()
     )
     
     logger.info(f"{email} 인증 완료, 계정 활성화됨.")
@@ -136,14 +156,10 @@ async def login(user: UserLogin, response: Response):
     response.set_cookie(
         key="access_token",
         value=token,
-        httponly=True,
-        max_age=3600,
-        secure=True,         # production 환경에서는 True
-        samesite="None",      # cross-site 요청 허용
-        domain=".sel4.cloudtype.app"  # 백엔드 도메인에 맞게 설정
+        **get_cookie_options()
     )
     
-    logger.info(f"{user.email} 로그인 성공, JWT 토큰 발급됨.")
+    logger.info(f"{existing['email']} 로그인 성공, JWT 토큰 발급됨.")
     return {"message": "로그인 성공"}
 
 @router.get("/me", status_code=status.HTTP_200_OK)
@@ -167,5 +183,8 @@ async def get_current_user_endpoint(access_token: str = Cookie(None)):
 
 @router.post("/logout", status_code=status.HTTP_200_OK)
 async def logout(response: Response):
-    response.delete_cookie("access_token", domain=".sel4.cloudtype.app")
+    if is_local:
+        response.delete_cookie("access_token")
+    else:
+        response.delete_cookie("access_token", domain=".sel4.cloudtype.app")
     return {"message": "로그아웃 성공"}

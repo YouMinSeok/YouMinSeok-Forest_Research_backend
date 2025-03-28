@@ -14,9 +14,11 @@ app = FastAPI(
 origins = [
     "http://localhost:3000",
     "http://192.168.0.11:3000",
-    "https://researchforest.netlify.app",  # 프론트엔드(프로덕션) 주소
+    "http://192.168.92.1:3000",              # 현재 사용 중인 프론트엔드 오리진
+    "https://researchforest.netlify.app",    # 프로덕션 프론트엔드 주소
     "https://port-0-youminseok-forest-research-backend-m8qrfco7a6ee3b26.sel4.cloudtype.app",  # 백엔드 주소
 ]
+
 
 app.add_middleware(
     CORSMiddleware,
