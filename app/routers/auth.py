@@ -15,7 +15,6 @@ logger = logging.getLogger("auth_router")
 logging.basicConfig(level=logging.INFO)
 
 # settings.DEBUG를 사용하여 로컬/프로덕션 환경을 구분합니다.
-# 로컬: settings.DEBUG == True, 프로덕션: settings.DEBUG == False
 is_local = settings.DEBUG
 
 def get_cookie_options():
@@ -111,7 +110,6 @@ async def verify_code(data: dict, response: Response):
     if record["code"] != code:
         raise HTTPException(status_code=400, detail="인증 코드가 일치하지 않습니다.")
     
-    # 계정 활성화
     await db.users.update_one({"email": email}, {"$set": {"is_active": True}})
     await db.user_verification.delete_one({"email": email, "role": role})
     
@@ -184,5 +182,5 @@ async def get_current_user_endpoint(access_token: str = Cookie(None)):
 
 @router.post("/logout", status_code=status.HTTP_200_OK)
 async def logout(response: Response):
-    response.delete_cookie("access_token")  # domain 옵션 없이 삭제
+    response.delete_cookie("access_token")
     return {"message": "로그아웃 성공"}
