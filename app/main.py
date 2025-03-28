@@ -16,13 +16,12 @@ origins = [
     "http://192.168.0.11:3000",
     "http://192.168.92.1:3000",              # 현재 사용 중인 프론트엔드 오리진
     "https://researchforest.netlify.app",    # 프로덕션 프론트엔드 주소
-    "https://port-0-youminseok-forest-research-backend-m8qrfco7a6ee3b26.sel4.cloudtype.app",  # 백엔드 주소
+    "https://port-0-youminseok-forest-research-backend-m8qrfco7a6ee3b26.sel4.cloudtype.app",  # 백엔드 공개 주소
 ]
-
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=origins,         # 위 목록에 포함된 오리진만 허용
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
