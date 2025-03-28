@@ -34,9 +34,8 @@ def get_cookie_options():
             "httponly": True,
             "max_age": 3600,
             "secure": True,        # HTTPS 환경에서는 True
-            "samesite": "None",     # cross-site 요청 허용
-            "domain": ".sel4.cloudtype.app",  # 백엔드 상위 도메인 (예: Cloudtype 제공 도메인)
-            "path": "/"
+            "samesite": "None",    # cross-site 요청 허용
+            "path": "/"            # domain 옵션 제거
         }
 
 def fix_mongo_object_ids(obj):
@@ -185,8 +184,5 @@ async def get_current_user_endpoint(access_token: str = Cookie(None)):
 
 @router.post("/logout", status_code=status.HTTP_200_OK)
 async def logout(response: Response):
-    if is_local:
-        response.delete_cookie("access_token")
-    else:
-        response.delete_cookie("access_token", domain=".sel4.cloudtype.app")
+    response.delete_cookie("access_token")  # domain 옵션 없이 삭제
     return {"message": "로그아웃 성공"}
