@@ -14,26 +14,28 @@ router = APIRouter()
 logger = logging.getLogger("auth_router")
 logging.basicConfig(level=logging.INFO)
 
-# 백엔드에서는 settings.DEBUG를 사용하여 로컬 여부를 판단합니다.
-# 로컬이면 settings.DEBUG가 True, 프로덕션이면 False로 설정되어 있어야 합니다.
+# settings.DEBUG를 사용하여 로컬/프로덕션 환경을 구분합니다.
+# 로컬: settings.DEBUG == True, 프로덕션: settings.DEBUG == False
 is_local = settings.DEBUG
 
 def get_cookie_options():
     if is_local:
+        # 로컬 환경 (HTTP)
         return {
             "httponly": True,
             "max_age": 3600,
-            "secure": False,       # 로컬: HTTP 환경이므로
-            "samesite": "Lax",     # 로컬: Lax 사용
-            "path": "/"            # 모든 경로에 적용
+            "secure": False,       # HTTP에서는 secure False
+            "samesite": "Lax",     # 기본적으로 Lax
+            "path": "/"            # 전체 경로 적용
         }
     else:
+        # 프로덕션 환경 (HTTPS)
         return {
             "httponly": True,
             "max_age": 3600,
-            "secure": True,        # 프로덕션: HTTPS 환경
+            "secure": True,        # HTTPS 환경에서는 True
             "samesite": "None",     # cross-site 요청 허용
-            "domain": ".sel4.cloudtype.app",  # 백엔드 상위 도메인
+            "domain": ".sel4.cloudtype.app",  # 백엔드 상위 도메인 (예: Cloudtype 제공 도메인)
             "path": "/"
         }
 
