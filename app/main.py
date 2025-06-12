@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routers import auth, research, board
+from app.routers import auth, research, board, activity
 from app.core.config import settings
 from app.core.database import connect_to_mongo, close_mongo_connection
 
@@ -15,6 +15,7 @@ origins = [
     "http://localhost:3000",
     "http://192.168.0.11:3000",
     "http://192.168.92.1:3000",              # 현재 사용 중인 프론트엔드 오리진
+    "http://172.30.1.71:3000",
     "https://researchforest.netlify.app",    # 프로덕션 프론트엔드 주소
     "https://port-0-youminseok-forest-research-backend-m8qrfco7a6ee3b26.sel4.cloudtype.app",  # 백엔드 공개 주소
 ]
@@ -41,6 +42,7 @@ async def shutdown_event():
 app.include_router(auth.router, prefix="/api/auth", tags=["auth"])
 app.include_router(research.router, prefix="/api/research", tags=["research"])
 app.include_router(board.router, prefix="/api/board", tags=["board"])
+app.include_router(activity.router, prefix="/api/activity", tags=["activity"])
 
 @app.get("/ping")
 async def ping():
