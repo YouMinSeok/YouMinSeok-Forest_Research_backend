@@ -1,5 +1,6 @@
 from passlib.context import CryptContext
-from fastapi import HTTPException, Cookie
+from fastapi import HTTPException, Cookie, Header
+from typing import Optional
 import jwt  # PyJWT 사용
 from jwt import ExpiredSignatureError, InvalidTokenError
 from app.core.config import settings
@@ -28,5 +29,5 @@ def get_current_user(access_token: str = Cookie(None)):
         raise HTTPException(status_code=401, detail="토큰이 만료되었습니다.")
     except InvalidTokenError:
         raise HTTPException(status_code=401, detail="유효하지 않은 토큰입니다.")
-    
+
     return {"id": user_id, "name": user_name}

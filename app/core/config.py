@@ -13,6 +13,7 @@ class Settings:
     DATABASE_NAME = os.getenv("DATABASE_NAME", "research_forest")
 
     SECRET_KEY = os.getenv("SECRET_KEY", "your-secret-key")
+    ALGORITHM = os.getenv("ALGORITHM", "HS256")
 
     # 이메일 제공자 선택 ("gmail" 또는 "naver")
     EMAIL_PROVIDER = os.getenv("EMAIL_PROVIDER", "gmail").lower()
