@@ -14,7 +14,13 @@ app = FastAPI(
 # 허용할 도메인 목록을 먼저 정의
 cors_origins = [
     "http://localhost:3000",
+    "http://localhost:3001",
+    "http://localhost:5000",
+    "http://localhost:8080",
     "http://192.168.0.11:3000",
+    "http://192.168.0.11:3001",
+    "http://192.168.0.11:5000",
+    "http://192.168.0.11:8080",
     "http://192.168.92.1:3000",
     "http://172.30.1.71:3000",
     "https://researchforest.netlify.app",

@@ -22,7 +22,7 @@ def get_cookie_options():
         # 로컬 환경 (HTTP)
         return {
             "httponly": True,
-            "max_age": 3600,
+            "max_age": 2592000,  # 30일 (30 * 24 * 60 * 60)
             "secure": False,       # HTTP에서는 secure False
             "samesite": "Lax",     # 기본적으로 Lax
             "path": "/"            # 전체 경로 적용
@@ -31,7 +31,7 @@ def get_cookie_options():
         # 프로덕션 환경 (HTTPS)
         return {
             "httponly": True,
-            "max_age": 3600,
+            "max_age": 2592000,  # 30일 (30 * 24 * 60 * 60)
             "secure": True,        # HTTPS 환경에서는 True
             "samesite": "None",    # cross-site 요청 허용
             "path": "/"            # domain 옵션 제거
@@ -118,7 +118,7 @@ async def verify_code(data: dict, response: Response):
         raise HTTPException(status_code=404, detail="사용자 정보를 찾을 수 없습니다.")
 
     current_time = datetime.utcnow()
-    expiry_time = current_time + timedelta(hours=24)  # 24시간으로 연장
+    expiry_time = current_time + timedelta(days=30)  # 30일로 대폭 연장
     logger.info(f"이메일 인증 토큰 생성 - 현재 시간: {current_time}, 만료 시간: {expiry_time}")
 
     payload = {
@@ -149,7 +149,7 @@ async def login(user: UserLogin, response: Response):
         raise HTTPException(status_code=400, detail="계정이 활성화되지 않았습니다. 이메일 인증을 진행해주세요.")
 
     current_time = datetime.utcnow()
-    expiry_time = current_time + timedelta(hours=24)  # 24시간으로 연장
+    expiry_time = current_time + timedelta(days=30)  # 30일로 대폭 연장
     logger.info(f"로그인 토큰 생성 - 현재 시간: {current_time}, 만료 시간: {expiry_time}")
 
     payload = {
